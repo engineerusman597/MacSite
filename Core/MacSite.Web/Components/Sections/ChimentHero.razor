@@ -1,56 +1,50 @@
+@inject IHeroSlideRepository Slides
+@inject SiteContentService Content
+
 <div class="home-banner" id="home">
-    <div class="slider">
-        <div class="slide">
-            <div class="image">
-                <img src="assets/images/banner/banner-img1.png" alt="Banner">
-                <div class="caption">
-                    <h1>@((MarkupString)Headline)</h1>
-                    <a href="/portfolio" class="btn btn-secondary">ENTER PORTFOLIO</a>
+    <div class="slider" data-slick="@_configOptions">
+        @foreach (var slide in _slides)
+        {
+            <div class="slide">
+                <div class="image">
+                    <img src="@ContentLinks.SafeUrl(slide.ImageUrl)" alt="@slide.Alt">
+                    <div class="caption">
+                        @if (_config.ShowCaptions)
+                        {
+                            <h1>@ContentLinks.InlineText(string.IsNullOrWhiteSpace(slide.Headline) ? _settings.DefaultHeroHeadline : slide.Headline)</h1>
+                        }
+                        <a href="/portfolio" class="btn btn-secondary">ENTER PORTFOLIO</a>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="slide">
-            <div class="image">
-                <img src="assets/images/banner/banner-img2.jpg" alt="Banner">
-                <div class="caption">
-                    <h1>@((MarkupString)Headline)</h1>
-                </div>
-            </div>
-        </div>
-        <div class="slide">
-            <div class="image">
-                <img src="assets/images/banner/banne-img3.JPG" alt="Banner">
-                <div class="caption">
-                    <h1>@((MarkupString)Headline)</h1>
-                    <a href="/portfolio" class="btn btn-secondary">ENTER PORTFOLIO</a>
-                </div>
-            </div>
-        </div>
-        <div class="slide">
-            <div class="image">
-                <img src="assets/images/banner/banner-img-4.jpg" alt="Banner">
-                <div class="caption">
-                    <h1>@((MarkupString)Headline)</h1>
-                </div>
-            </div>
-        </div>
+        }
     </div>
     <div class="separator">
         <img src="assets/images/separator.svg" alt="">
     </div>
     <div class="container">
-        <div class="play-icon">
+        <a class="play-icon" href="@ContentLinks.SafeUrl(_settings.HeroVideoUrl)" aria-label="@_settings.HeroVideoBadgeText">
             <div class="inner">
-                <img src="assets/images/play-icon-image.png" class="inner-image">
+                <img src="assets/images/play-icon-image.png" class="inner-image" alt="">
             </div>
             <img src="assets/images/play.svg" class="icon" alt="">
             <span class="text">
                 <ChimentWatchTextSvg />
             </span>
-        </div>
+        </a>
     </div>
 </div>
 
 @code {
-    [Parameter] public string Headline { get; set; } = "TRANSFORMING STORYTELLING THROUGH SET &amp; COSTUME DESIGN";
+    private IReadOnlyList<HeroSlide> _slides = [];
+    private SiteSettings _settings = new();
+    private SectionConfig _config = new();
+    private string _configOptions => SiteContentService.SlickOptions(_config);
+
+    protected override async Task OnInitializedAsync()
+    {
+        _slides = await Slides.GetActiveAsync();
+        _settings = await Content.GetSettingsAsync();
+        _config = await Content.GetConfigAsync(SectionConfig.Hero);
+    }
 }

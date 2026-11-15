@@ -20,6 +20,10 @@
             <div class="field"><label>Interval (ms)</label><input class="input" type="number" @bind="cfg.IntervalMs" /></div>
         </div>
         <div class="field-row">
+            @if (cfg.Key == SectionConfig.Hero)
+            {
+                <label class="checkbox"><input type="checkbox" @bind="cfg.ShowArrows" /> Show arrows</label>
+            }
             <label class="checkbox"><input type="checkbox" @bind="cfg.ShowDots" /> Show dots</label>
             <label class="checkbox"><input type="checkbox" @bind="cfg.ShowCaptions" /> Show captions</label>
         </div>
