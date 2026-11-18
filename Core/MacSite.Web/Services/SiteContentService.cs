@@ -24,8 +24,10 @@ public sealed class SiteContentService(
     }
     public static string SlickOptions(SectionConfig config)
     {
-        var desktop = Math.Clamp(config.SlidesVisibleDesktop, 1, 8);
-        var mobile = Math.Clamp(config.SlidesVisibleMobile, 1, 4);
+        // The hero is always one full-width slide, including when its settings row is absent.
+        var isHero = config.Key == SectionConfig.Hero;
+        var desktop = isHero ? 1 : Math.Clamp(config.SlidesVisibleDesktop, 1, 8);
+        var mobile = isHero ? 1 : Math.Clamp(config.SlidesVisibleMobile, 1, 4);
         return System.Text.Json.JsonSerializer.Serialize(new
         {
             autoplay = config.Autoplay,
@@ -33,7 +35,7 @@ public sealed class SiteContentService(
             dots = config.ShowDots,
             arrows = config.ShowArrows,
             slidesToShow = desktop,
-            fade = config.Key == SectionConfig.Hero && desktop == 1 && mobile == 1,
+            fade = isHero,
             responsive = new[] { new { breakpoint = 992, settings = new { slidesToShow = mobile } } }
         });
     }

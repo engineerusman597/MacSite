@@ -1,4 +1,5 @@
 @rendermode InteractiveServer
+@implements IDisposable
 @inject ISubscriberRepository Subscribers
 
 <div class="@(Chiment ? "signup signup--chiment" : "signup")">
@@ -26,6 +27,7 @@
 @code {
     [Parameter] public bool Chiment { get; set; }
     private readonly Model _model = new();
+    private readonly CancellationTokenSource _lifetime = new();
     private bool _done;
     private bool _busy;
     private string? _error;
@@ -38,9 +40,10 @@
         try
         {
             if (string.IsNullOrWhiteSpace(_model.Email)) return;
-            await Subscribers.AddAsync(_model.Email);
+            await Subscribers.AddAsync(_model.Email, _lifetime.Token);
             _done = true;
         }
+        catch (OperationCanceledException) when (_lifetime.IsCancellationRequested) { }
         catch (System.Data.Common.DbException)
         {
             _error = "We could not save your submission. Please try again.";
@@ -49,6 +52,12 @@
         {
             _busy = false;
         }
+    }
+
+    public void Dispose()
+    {
+        _lifetime.Cancel();
+        _lifetime.Dispose();
     }
 
     private sealed class Model

@@ -15,6 +15,13 @@ internal static class ContentLinks
             ? value : null;
     }
 
+    public static string? HeroVideoUrl(string? value)
+    {
+        var url = SafeUrl(value);
+        // Older databases may still contain the original seed. Do not rewrite existing settings.
+        return url is not null && !url.Contains("dQw4w9WgXcQ", StringComparison.OrdinalIgnoreCase) ? url : null;
+    }
+
     // Editors may underline an announcement or insert headline breaks. Encode all other markup.
     public static MarkupString InlineText(string? value)
     {

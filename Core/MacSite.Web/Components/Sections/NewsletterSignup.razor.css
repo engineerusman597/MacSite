@@ -51,7 +51,10 @@
     margin: 0;
 }
 
-.signup ::deep .validation-message { color: #572718; font-size: 14px; margin-top: 8px; display: block; }
+.signup ::deep .validation-message,
+.signup [role="alert"] { color: #7a1f16; background: #fff5ec; padding: 6px 10px; border-radius: 4px; font-size: 14px; margin-top: 8px; display: block; }
+.signup--chiment ::deep .validation-message,
+.signup--chiment [role="alert"] { color: #572718; }
 
 .signup--chiment { max-width: 809px; }
 .signup--chiment ::deep .signup-form { display: block; }
